@@ -48,18 +48,39 @@ const ChatPage = () => {
         setInputText("");
         setIsProcessing(true);
 
-        // Simulate AI response (replace with actual API call to your embedded LLM)
-        setTimeout(() => {
-            const aiResponse: Message = {
-                text: "I’m analyzing your question. Can you tell me more about the job description you’re preparing for?",
-                isUser: false,
-                timestamp: new Date()
-            };
+        const aiMessage: Message = {
+            text:"",
+            isUser:false,
+            timestamp: new Date()
+        }
+        setMessages(prevMessages => [...prevMessages, aiMessage]);
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/chat/stream/${encodeURIComponent(inputText)}`)
+            if (!response.body) {
+                throw new Error("No response body received.")
+            }
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder("utf-8");
 
-            setMessages(prevMessages => [...prevMessages, aiResponse]);
+            let accumulatedText = ""
+            while(true) {
+                const { done, value } = await reader.read();
+                if(done) break;
+
+                accumulatedText +=decoder.decode(value, { stream: true});
+
+                setMessages(prevMessages => {
+                    const updatedMessages = [...prevMessages]
+                    updatedMessages[updatedMessages.length -1].text = accumulatedText
+                    return [...updatedMessages]
+                });
+            }
+        }catch (error) {
+            console.error("Error fetching AI response.", error);
+        } finally {
             setIsProcessing(false);
-        }, 1000);
-    };
+        }
+    }
 
     const startNewChat = () => {
         setMessages([
