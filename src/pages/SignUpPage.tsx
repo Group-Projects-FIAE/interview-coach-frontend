@@ -1,6 +1,8 @@
 import {FormEvent, useState} from 'react';
 import {Link} from "react-router";
 import logo from "../assets/logo.png";
+import IconButton from "@mui/material/IconButton";
+import LanguageIcon from "@mui/icons-material/Language";
 
 function SignUpPage() {
   const [firstName, setFirstName] = useState('');
@@ -110,6 +112,11 @@ function SignUpPage() {
           </form>
         </div>
       </main>
+      <div className="language-icon-container">
+        <IconButton aria-label="Lanquage">
+          <LanguageIcon/>
+        </IconButton>
+      </div>
     </div>
   );
 }

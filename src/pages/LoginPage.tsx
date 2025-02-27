@@ -1,6 +1,8 @@
 import {FormEvent, useState} from "react";
 import logo from "../assets/logo.png";
 import {Link} from "react-router";
+import IconButton from "@mui/material/IconButton";
+import LanguageIcon from "@mui/icons-material/Language";
 
 
 function LoginPage() {
@@ -75,6 +77,11 @@ function LoginPage() {
           </div>
         </div>
       </main>
+      <div className="language-icon-container">
+        <IconButton aria-label="Lanquage">
+          <LanguageIcon/>
+        </IconButton>
+      </div>
     </div>
   );
 }

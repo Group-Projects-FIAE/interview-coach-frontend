@@ -6,6 +6,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
 import SendIcon from "@mui/icons-material/Send";
 import logo from "../assets/logo.png"
+import LanguageIcon from '@mui/icons-material/Language';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 
 interface Message {
@@ -70,88 +72,97 @@ const ChatPage = () => {
     };
 
     return (
-        <div className="chat-container">
-            {/* Sidebar */}
-            <div className="sidebar">
-                <div className="logo-container">
-                    <img src={logo} alt="Logo" className="logo"/>
-                </div>
-                <div className="sidebar-actions">
-                    <IconButton aria-label="Chat" onClick={startNewChat}>
-                        <ChatBubbleOutlineIcon/>
-                    </IconButton>
-                    <IconButton aria-label="Chat History">
-                        <FormatListBulletedIcon/>
-                    </IconButton>
-                </div>
+      <div className="chat-container">
 
-                <div className="sidebar-footer">
-                    <div className="sidebar-actions">
-                        <IconButton aria-label="Settings">
-                            <SettingsIcon/>
-                        </IconButton>
-                        <IconButton aria-label="Info">
-                            <InfoIcon/>
-                        </IconButton>
-                    </div>
-                </div>
-            </div>
+          {/* Sidebar */}
+          <div className="sidebar">
+              <div className="logo-container">
+                  <img src={logo} alt="Logo" className="logo"/>
+              </div>
+              <div className="sidebar-actions">
+                  <IconButton aria-label="Chat" onClick={startNewChat}>
+                      <ChatBubbleOutlineIcon/>
+                  </IconButton>
+                  <IconButton aria-label="Chat History">
+                      <FormatListBulletedIcon/>
+                  </IconButton>
+              </div>
 
-            {/* Main Chat Area */}
-            <div className="chat-area">
-                <div className="messages-container">
-                    {messages.map((message, index) => (
-                        <div
-                            key={index}
-                            className={`message ${message.isUser ? "user-message" : "ai-message"}`}
-                        >
-                            {!message.isUser && (
-                                <div className="ai-avatar">
-                                    <div className="ai-avatar-inner"></div>
-                                </div>
-                            )}
-                            <div className="message-bubble">
-                                <p>{message.text}</p>
-                            </div>
-                        </div>
-                    ))}
+              <div className="sidebar-footer">
+                  <div className="sidebar-actions">
+                      <IconButton aria-label="Settings">
+                          <SettingsIcon/>
+                      </IconButton>
+                      <IconButton aria-label="Info">
+                          <InfoIcon/>
+                      </IconButton>
+                  </div>
+              </div>
+          </div>
 
-                    {isProcessing && (
-                        <div className="message ai-message">
-                            <div className="ai-avatar">
-                                <div className="ai-avatar-inner"></div>
-                            </div>
-                            <div className="message-bubble typing-indicator">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                    )}
-
-                    <div ref={messagesEndRef}/>
-                </div>
-
-                <form className="input-area" onSubmit={handleSendMessage}>
-                    <input
-                        type="text"
-                        placeholder="Ask me....."
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        disabled={isProcessing}
-                        className="message-input"
-                    />
-                    <IconButton
-                        type="submit"
-                        disabled={!inputText.trim() || isProcessing}
-                        className="send-button"
+          {/* Main Chat Area */}
+          <div className="chat-area">
+              <div className="messages-container">
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`message ${message.isUser ? "user-message" : "ai-message"}`}
                     >
-                        <SendIcon/>
-                    </IconButton>
-                </form>
-            </div>
-        </div>
+                        {!message.isUser && (
+                          <div className="ai-avatar">
+                              <div className="ai-avatar-inner"></div>
+                          </div>
+                        )}
+                        <div className="message-bubble">
+                            <p>{message.text}</p>
+                        </div>
+                    </div>
+                  ))}
+
+                  {isProcessing && (
+                    <div className="message ai-message">
+                        <div className="ai-avatar">
+                            <div className="ai-avatar-inner"></div>
+                        </div>
+                        <div className="message-bubble typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef}/>
+              </div>
+
+              <form className="input-area" onSubmit={handleSendMessage}>
+                  <input
+                    type="text"
+                    placeholder="Ask me....."
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    disabled={isProcessing}
+                    className="message-input"
+                  />
+                  <IconButton
+                    type="submit"
+                    disabled={!inputText.trim() || isProcessing}
+                    className="send-button"
+                  >
+                      <SendIcon/>
+                  </IconButton>
+              </form>
+          </div>
+          <div className="language-icon-container">
+              <IconButton aria-label="Lanquage">
+                  <LanguageIcon/>
+              </IconButton>
+              <IconButton aria-label="LogOut">
+                  <LogoutIcon/>
+              </IconButton>
+          </div>
+      </div>
     )
 }
 
-            export default ChatPage;
+export default ChatPage;

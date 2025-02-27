@@ -63,10 +63,18 @@
   object-fit: cover;
 }
 
+.language-icon-container {
+  right: 0;
+  margin: 20px;
+}
+
+
+
 /* Sidebar Styles */
 .sidebar {
+  margin: 20px;
   width: 70px;
-  min-height: 100vh;
+  min-height: 80vh;
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -75,8 +83,7 @@
   align-items: center;
   padding: 15px 0;
   z-index: 10;
-  border-radius: 0 20px 20px 0;
-  overflow-y: hidden;
+  border-radius: 20px;
   box-sizing: border-box;
 }
 
