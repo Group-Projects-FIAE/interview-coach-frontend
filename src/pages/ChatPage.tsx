@@ -80,20 +80,20 @@ const ChatPage = () => {
                   <img src={logo} alt="Logo" className="logo"/>
               </div>
               <div className="sidebar-actions">
-                  <IconButton aria-label="Chat" onClick={startNewChat}>
+                  <IconButton style={{ color: 'white' }} aria-label="Chat" onClick={startNewChat}>
                       <ChatBubbleOutlineIcon/>
                   </IconButton>
-                  <IconButton aria-label="Chat History">
+                  <IconButton style={{ color: 'white' }} aria-label="Chat History">
                       <FormatListBulletedIcon/>
                   </IconButton>
               </div>
 
               <div className="sidebar-footer">
                   <div className="sidebar-actions">
-                      <IconButton aria-label="Settings">
+                      <IconButton style={{ color: 'white' }} aria-label="Settings">
                           <SettingsIcon/>
                       </IconButton>
-                      <IconButton aria-label="Info">
+                      <IconButton style={{ color: 'white' }} aria-label="Info">
                           <InfoIcon/>
                       </IconButton>
                   </div>
@@ -144,7 +144,7 @@ const ChatPage = () => {
                     disabled={isProcessing}
                     className="message-input"
                   />
-                  <IconButton
+                  <IconButton style={{ color: 'white' }}
                     type="submit"
                     disabled={!inputText.trim() || isProcessing}
                     className="send-button"
@@ -154,10 +154,10 @@ const ChatPage = () => {
               </form>
           </div>
           <div className="language-icon-container">
-              <IconButton aria-label="Lanquage">
+              <IconButton style={{ color: 'white' }} aria-label="Lanquage">
                   <LanguageIcon/>
               </IconButton>
-              <IconButton aria-label="LogOut">
+              <IconButton style={{ color: 'white' }} aria-label="LogOut">
                   <LogoutIcon/>
               </IconButton>
           </div>

@@ -12,7 +12,7 @@ const Home: React.FC = () => {
           <img src={logo} alt="Logo" className="logo"/>
         </div>
         <div className="nav-buttons">
-          <IconButton aria-label="Lanquage"><LanguageIcon/></IconButton>
+          <IconButton style={{ color: 'white' }} aria-label="Lanquage"><LanguageIcon/></IconButton>
           <Link to="/login" className="nav-button">log in</Link>
           <Link to="/signup" className="nav-button">get started</Link>
         </div>

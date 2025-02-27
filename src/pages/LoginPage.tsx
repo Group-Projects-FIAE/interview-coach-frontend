@@ -78,7 +78,7 @@ function LoginPage() {
         </div>
       </main>
       <div className="language-icon-container">
-        <IconButton aria-label="Lanquage">
+        <IconButton style={{ color: 'white' }} aria-label="Lanquage">
           <LanguageIcon/>
         </IconButton>
       </div>
