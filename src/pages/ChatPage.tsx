@@ -8,6 +8,7 @@ import SendIcon from "@mui/icons-material/Send";
 import logo from "../assets/logo.png"
 import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { v4 as uuidv4 } from "uuid";
 
 
 interface Message {
@@ -17,9 +18,18 @@ interface Message {
 }
 
 const ChatPage = () => {
+    const [sessionId] = useState<string>(() => {
+        const storedSession = localStorage.getItem("sessionId")
+        if (!storedSession) {
+            const newSession = uuidv4()
+            localStorage.setItem("sessionId", newSession)
+            return newSession
+        }
+        return storedSession
+    })
     const [messages, setMessages] = useState<Message[]>([
         {
-            text: "Hi, its ur personal interview coach",
+            text: "Hi, I'm your personal interview coach.",
             isUser: false,
             timestamp: new Date()
         }
@@ -34,53 +44,46 @@ const ChatPage = () => {
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!inputText.trim()) return;
 
-        // Add user message
-        const userMessage: Message = {
-            text: inputText,
-            isUser: true,
-            timestamp: new Date()
-        };
+        addMessage(inputText, true)
+        setInputText("")
+        setIsProcessing(true)
 
-        setMessages(prevMessages => [...prevMessages, userMessage]);
-        setInputText("");
-        setIsProcessing(true);
+        await fetchAIResponse(inputText)
+    }
 
-        const aiMessage: Message = {
-            text:"",
-            isUser:false,
-            timestamp: new Date()
-        }
-        setMessages(prevMessages => [...prevMessages, aiMessage]);
+    const addMessage = (text: string, isUser: boolean) => {
+        setMessages((prev)=> [
+            ...prev,
+            {text,isUser, timestamp:new Date()}
+        ])
+    }
+
+    const fetchAIResponse = async (userInput: string) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/chat/stream/${encodeURIComponent(inputText)}`)
-            if (!response.body) {
-                throw new Error("No response body received.")
+            const url = `http://127.0.0.1:8000/chat?session_id=${sessionId}&user_input=${encodeURIComponent(userInput)}`;
+            const response = await fetch(url, { method: "GET" });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            const reader = response.body.getReader()
-            const decoder = new TextDecoder("utf-8");
 
-            let accumulatedText = ""
-            while(true) {
-                const { done, value } = await reader.read();
-                if(done) break;
-
-                accumulatedText +=decoder.decode(value, { stream: true});
-
-                setMessages(prevMessages => {
-                    const updatedMessages = [...prevMessages]
-                    updatedMessages[updatedMessages.length -1].text = accumulatedText
-                    return [...updatedMessages]
-                });
+            const data = await response.json();
+            if (!data.response) {
+                throw new Error("No response from AI.");
             }
-        }catch (error) {
-            console.error("Error fetching AI response.", error);
+
+            addMessage(data.response, false);
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            addMessage("AI is not responding. Please try again later.", false);
         } finally {
             setIsProcessing(false);
         }
-    }
+    };
+
+
 
     const startNewChat = () => {
         setMessages([
