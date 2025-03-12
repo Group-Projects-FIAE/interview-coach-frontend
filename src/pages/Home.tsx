@@ -14,7 +14,7 @@ const Home: React.FC = () => {
         <div className="nav-buttons">
           <IconButton style={{ color: 'white' }} aria-label="Lanquage"><LanguageIcon/></IconButton>
           <Link to="/login" className="nav-button">log in</Link>
-          <Link to="/signup" className="nav-button">get started</Link>
+          <Link to="/signup" className="nav-button">sign up</Link>
         </div>
       </header>
 
@@ -24,7 +24,7 @@ const Home: React.FC = () => {
           <span>interview</span>
           <span>coach</span>
         </h1>
-        <Link to="/signup" className="get-started-button">
+        <Link to="/pricing" className="get-started-button">
           get started
           <svg xmlns="http://www.w3.org/2000/svg" className="arrow-icon" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
