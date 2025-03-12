@@ -490,6 +490,7 @@
 }
 
 .form-input {
+  color: #333333;
   background-color: white;
   padding: 12px;
   border-radius: 9999px;
@@ -608,4 +609,86 @@
   .half-width {
     width: 100%;
   }
+}
+
+/* Pricing Page Styles */
+.pricing-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--glass-bg);
+  padding: 40px 20px;
+}
+
+.pricing-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pricing-title {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 40px;
+}
+
+.pricing-card {
+  max-width: 345px;
+  margin: 20px;
+  background: var(--card-bg);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.pricing-card .MuiCardContent-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pricing-card .MuiTypography-h5 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 16px;
+}
+
+.pricing-card .MuiTypography-h6 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.pricing-card .MuiTypography-body2 {
+  font-size: 16px;
+  color: var(--text-color);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pricing-card .MuiCardActions-root {
+  width: 100%;
+}
+
+.pricing-card .MuiButton-root {
+  width: 100%;
+  padding: 10px 0;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  border-radius: 0 0 15px 15px;
+  transition: background-color 0.3s;
+}
+
+.pricing-card .MuiButton-root:hover {
+  background-color: #357abd;
 }
