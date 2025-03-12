@@ -1,19 +1,40 @@
 import {FormEvent, useState} from "react";
 import logo from "../assets/logo.png";
-import {Link} from "react-router";
+import {Link, useNavigate} from "react-router";
 import IconButton from "@mui/material/IconButton";
 import LanguageIcon from "@mui/icons-material/Language";
+import axios from "axios";
 
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // In a real app, you would validate and authenticate here
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post('http://localhost:8080/login', { //check the keycloak endpoint
+        username: email,
+        password: password,
+      })
 
-  };
+      // Save the token in local storage or cookies
+      localStorage.setItem('access_token', response.data.access_token)
+
+      // Redirect to chat page
+      navigate('/chat')
+    } catch (error) {
+      console.error('An error occurred:', error)
+      setError('Invalid username or password')
+    }
+  }
+
+  const handleGoogleLogin = () => {
+    //todo
+  }
+
 
   return (
     <div className="chat-container">
@@ -53,7 +74,7 @@ function LoginPage() {
                 required
               />
             </div>
-
+            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="submit-button">
               log in
             </button>
@@ -64,7 +85,7 @@ function LoginPage() {
               <div className="divider-line"></div>
             </div>
 
-            <button type="button" className="google-button">
+            <button type="button" className="google-button" onClick={handleGoogleLogin}>
               Continue with Google
             </button>
           </form>
