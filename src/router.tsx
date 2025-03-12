@@ -5,6 +5,7 @@ import SignUpPage from "./pages/SignUpPage.tsx";
 import Home from "./pages/Home.tsx";
 import ChatPage from "./pages/ChatPage.tsx";
 import React from "react";
+import PricingPage from "./pages/PricingPage.tsx";
 
 const Router: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const Router: React.FC = () => {
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="chat" element={<ChatPage />} />
+          <Route path="pricing" element={<PricingPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
