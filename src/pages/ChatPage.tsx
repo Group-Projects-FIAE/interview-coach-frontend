@@ -29,7 +29,7 @@ const ChatPage = () => {
     })
     const [messages, setMessages] = useState<Message[]>([
         {
-            text: "Hi, I'm your personal interview coach.",
+            text: "Hi,I am your personal interview coach, which position did you applied",
             isUser: false,
             timestamp: new Date()
         }
@@ -88,7 +88,7 @@ const ChatPage = () => {
     const startNewChat = () => {
         setMessages([
             {
-                text: "Hi, its ur personal interview coach",
+                text: "Hi,I am your personal interview coach, how can I help?",
                 isUser: false,
                 timestamp: new Date()
             }
