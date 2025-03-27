@@ -16,7 +16,7 @@ function LoginPage() {
     e.preventDefault()
     try {
       const response = await axios.post('http://localhost:8000/login', { //check the keycloak endpoint
-        username: email,
+        email: email,
         password: password,
       })
 
