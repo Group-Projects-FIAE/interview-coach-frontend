@@ -15,8 +15,8 @@ function LoginPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:8080/login', { //check the keycloak endpoint
-        username: email,
+      const response = await axios.post('http://localhost:8000/login', { //check the keycloak endpoint
+        email: email,
         password: password,
       })
 
