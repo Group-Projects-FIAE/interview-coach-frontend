@@ -1,19 +1,40 @@
 import {FormEvent, useState} from 'react';
-import {Link} from "react-router";
+import {Link, useNavigate} from "react-router-dom";
+import { authService } from '../services/auth';
 import logo from "../assets/logo.png";
 import IconButton from "@mui/material/IconButton";
 import LanguageIcon from "@mui/icons-material/Language";
 
 function SignUpPage() {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [country, setCountry] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await authService.signup({
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName
+      });
+      navigate('/chat');
+    } catch (error) {
+      setError('Failed to create account. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <div className="chat-container">
       <header className="header">
@@ -28,6 +49,8 @@ function SignUpPage() {
         <div className="auth-card">
           <h1 className="auth-title">Sign up</h1>
 
+          {error && <div className="error-message">{error}</div>}
+
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="name-row">
               <div className="form-group half-width">
@@ -39,6 +62,7 @@ function SignUpPage() {
                   onChange={(e) => setFirstName(e.target.value)}
                   className="form-input"
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="form-group half-width">
@@ -50,6 +74,7 @@ function SignUpPage() {
                   onChange={(e) => setLastName(e.target.value)}
                   className="form-input"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -62,13 +87,13 @@ function SignUpPage() {
                 onChange={(e) => setCountry(e.target.value)}
                 className="form-input form-select"
                 required
+                disabled={isLoading}
               >
                 <option value="" disabled>Select your country</option>
                 <option value="us">United States</option>
                 <option value="ca">Canada</option>
                 <option value="uk">United Kingdom</option>
                 <option value="au">Australia</option>
-                {/* Add more countries as needed */}
               </select>
             </div>
 
@@ -81,6 +106,7 @@ function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="form-input"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -93,11 +119,12 @@ function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="form-input"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            <button type="submit" className="submit-button">
-              sign up
+            <button type="submit" className="submit-button" disabled={isLoading}>
+              {isLoading ? 'Signing up...' : 'Sign up'}
             </button>
 
             <div className="divider">
@@ -106,14 +133,14 @@ function SignUpPage() {
               <div className="divider-line"></div>
             </div>
 
-            <button type="button" className="google-button">
+            <button type="button" className="google-button" disabled={isLoading}>
               Continue with Google
             </button>
           </form>
         </div>
       </main>
       <div className="language-icon-container">
-        <IconButton style={{ color: 'white' }} aria-label="Lanquage">
+        <IconButton style={{ color: 'white' }} aria-label="Language">
           <LanguageIcon/>
         </IconButton>
       </div>
