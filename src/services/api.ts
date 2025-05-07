@@ -37,13 +37,16 @@ api.interceptors.response.use(
 
 export const chatApi = {
     sendMessage: async (sessionId: string, userInput: string) => {
-        const response = await api.get(`/chat`, {
-            params: {
-                session_id: sessionId,
-                user_input: userInput
-            }
-        });
-        return response.data;
+        try {
+            const response = await api.post(`/chat`, {
+                sessionId: sessionId,
+                userInput: userInput
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Message sending failed:', error);
+            throw error;
+        }
     },
 
     getChatHistory: async (sessionId: string) => {
@@ -64,9 +67,17 @@ export const chatApi = {
     },
 
     createSession: async (sessionId: string) => {
-        const response = await api.post(`/session`, null, {
-            params: { session_id: sessionId }
-        });
-        return response.data;
+        try {
+            console.log('Creating session with ID:', sessionId);
+            const response = await api.post(`/session?session_id=${sessionId}`);
+            console.log('Session creation response:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Session creation failed:', error);
+            if (error.response) {
+                console.error('Error response:', error.response.data);
+            }
+            throw error;
+        }
     }
 }; 
