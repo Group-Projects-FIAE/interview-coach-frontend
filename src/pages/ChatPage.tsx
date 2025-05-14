@@ -9,37 +9,60 @@ import logo from "../assets/logo.png";
 import LanguageIcon from "@mui/icons-material/Language";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { v4 as uuidv4 } from "uuid";
-
+import {chatApi} from "../services/api";
+import {authService} from "../services/auth";
+import {useNavigate} from "react-router-dom";
 interface Message {
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
+  text: string
+  isUser: boolean
+  timestamp: Date
 }
 
 const ChatPage = () => {
-  const [sessionId] = useState<string>(() => {
-    const storedSession = localStorage.getItem("sessionId");
-    if (!storedSession) {
-      const newSession = uuidv4();
-      localStorage.setItem("sessionId", newSession);
-      return newSession;
-    }
-    return storedSession;
-  });
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      text: "Hi,I am your personal interview coach, which position did you applied",
-      isUser: false,
-      timestamp: new Date(),
-    },
-  ]);
-  const [inputText, setInputText] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate()
+    const [sessionId] = useState<string>(() => {
+        const storedSession = localStorage.getItem("sessionId")
+        if (!storedSession) {
+            const newSession = uuidv4()
+            localStorage.setItem("sessionId", newSession)
+            return newSession
+        }
+        return storedSession
+    })
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [inputText, setInputText] = useState("")
+    const [isProcessing, setIsProcessing] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        // Check authentication on component mount
+        if (!authService.isAuthenticated()) {
+            navigate('/login')
+            return
+        }
+
+        // Initialize session with backend
+        const initializeSession = async () => {
+            try {
+                await chatApi.createSession(sessionId)
+                // Add initial message after successful session creation
+                setMessages([{
+                    text: "Hi, I am your personal interview coach, which position did you apply for?",
+                    isUser: false,
+                    timestamp: new Date()
+                }]);
+            } catch (error) {
+                console.error('Failed to initialize session:', error)
+                setError('Failed to initialize chat session. Please try refreshing the page.')
+            }
+        };
+        initializeSession()
+    }, [sessionId, navigate])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -53,43 +76,35 @@ const ChatPage = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isProcessing) return
 
-    addMessage(inputText, true);
+    setError(null)
+        addMessage(inputText, true);
     setInputText("");
     setIsProcessing(true);
 
-    await fetchAIResponse(inputText);
-  };
+    try {
+            const response = await chatApi.sendMessage(sessionId, inputText);
+  if (response && response.response) {
+                addMessage(response.response, false);
+            } else {
+                throw new Error('Invalid response format')
+            }
+        } catch (error: any) {
+            console.error("Error fetching AI response:", error)
+            const errorMessage = error.response?.data?.detail || "AI is not responding. Please try again later."
+            setError(errorMessage)
+            addMessage("Sorry, I encountered an error. Please try again.", false)
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
   const addMessage = (text: string, isUser: boolean) => {
     setMessages((prev) => [...prev, { text, isUser, timestamp: new Date() }]);
   };
 
-  const fetchAIResponse = async (userInput: string) => {
-    try {
-      const url = `http://127.0.0.1:8000/chat?session_id=${sessionId}&user_input=${encodeURIComponent(
-        userInput
-      )}`;
-      const response = await fetch(url, { method: "GET" });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!data.response) {
-        throw new Error("No response from AI.");
-      }
-
-      addMessage(data.response, false);
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      addMessage("AI is not responding. Please try again later.", false);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const startNewChat = () => {
     setMessages([
@@ -98,8 +113,11 @@ const ChatPage = () => {
         isUser: false,
         timestamp: new Date(),
       },
-    ]);
-  };
+    ])
+  }const handleLogout = () => {
+        authService.logout()
+        navigate('/login')
+    }
 
   return (
     <div className="chat-container">
@@ -135,7 +153,11 @@ const ChatPage = () => {
 
       {/* Main Chat Area */}
       <div className="chat-area">
-        <div className="messages-container">
+        {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}<div className="messages-container">
           {messages.map((message, index) => (
             <div
               key={index}
@@ -191,10 +213,10 @@ const ChatPage = () => {
         </form>
       </div>
       <div className="language-icon-container">
-        <IconButton style={{ color: "white" }} aria-label="Lanquage">
+        <IconButton style={{ color: "white"}} aria-label="Language">
           <LanguageIcon />
         </IconButton>
-        <IconButton style={{ color: "white" }} aria-label="LogOut">
+        <IconButton style={{ color: "white"}} aria-label="LogOut" onClick={handleLogout}>
           <LogoutIcon />
         </IconButton>
       </div>
@@ -202,4 +224,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default ChatPage
