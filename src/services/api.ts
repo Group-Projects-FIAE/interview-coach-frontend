@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { authService } from './auth';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'http://localhost:8000';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -25,11 +25,30 @@ api.interceptors.request.use(
 // Add response interceptor to handle auth errors
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         if (error.response?.status === 401) {
-            // Handle unauthorized access
-            authService.logout();
-            window.location.href = '/login';
+            // Try to refresh the token
+            try {
+                const refreshResponse = await axios.post(
+                    `${API_BASE_URL}/auth/refresh`,
+                    {},
+                    { withCredentials: true }
+                );
+                const { access_token } = refreshResponse.data;
+                if (access_token) {
+                    // Update token in authService
+                    authService.setToken(access_token);
+                    // Retry the original request with new token
+                    const originalRequest = error.config;
+                    originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
+                    return api(originalRequest);
+                }
+            } catch (refreshError) {
+                // Refresh failed, log out
+                authService.logout();
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            }
         }
         return Promise.reject(error);
     }

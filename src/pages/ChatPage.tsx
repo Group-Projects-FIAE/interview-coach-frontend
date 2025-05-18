@@ -114,7 +114,8 @@ const ChatPage = () => {
         timestamp: new Date(),
       },
     ])
-  }const handleLogout = () => {
+  }
+  const handleLogout = () => {
         authService.logout()
         navigate('/login')
     }

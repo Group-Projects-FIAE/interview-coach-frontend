@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { chatApi } from './api';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'http://localhost:8000';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
@@ -142,7 +142,7 @@ class AuthService {
         return this.token
     }
 
-    private setToken(token: string): void {
+    public setToken(token: string): void {
         this.token = token
         localStorage.setItem('auth_token', token)
     }
