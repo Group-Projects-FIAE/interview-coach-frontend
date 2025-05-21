@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from "uuid";
 import { chatApi } from "../services/api";
 import { authService } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router";
+
 interface Message {
   text: string;
   isUser: boolean;
@@ -21,68 +23,59 @@ interface Message {
 const ChatPage = () => {
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | undefined>();
-  const [isSessionInitialized, setIsSessionInitialized] =
-    useState<boolean>(false);
+  const [isSessionInitialized, setIsSessionInitialized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Load or generate sessionId
   useEffect(() => {
     const storedSession = localStorage.getItem("sessionId");
-    if (!storedSession) {
+    if (storedSession) {
+      setSessionId(storedSession);
+    } else {
       const newSession = uuidv4();
       localStorage.setItem("sessionId", newSession);
       setSessionId(newSession);
-    } else {
-      setSessionId(storedSession);
     }
   }, []);
 
+  // Initialize session with backend and show welcome message
   useEffect(() => {
-    // Check authentication on component mount
-    if (!authService.isAuthenticated()) {
-      navigate("/login");
-      return;
-    }
-
-    // Initialize session with backend
     const initializeSession = async () => {
+      if (!sessionId || isSessionInitialized) return;
+
       try {
-        if (sessionId == undefined) {
-          console.log("No session id");
-          return;
-        }
         await chatApi.createSession(sessionId);
-        // Add initial message after successful session creation
         setMessages([
           {
-            text: "Hi, I am your personal interview coach, which position did you apply for?",
+            text:
+                "Hi! I'm your personal Interview Coach.\n" +
+                "To get started, just paste the job description or a link to the job posting you're applying for.\n" +
+                "I’ll tailor the session to your role and guide you through your options.",
             isUser: false,
             timestamp: new Date(),
           },
         ]);
+        setIsSessionInitialized(true);
       } catch (error) {
         console.error("Failed to initialize session:", error);
-        setError(
-          "Failed to initialize chat session. Please try refreshing the page."
-        );
+        setError("Failed to initialize chat session. Please refresh the page.");
       }
     };
-    if (!isSessionInitialized) {
-      initializeSession().then(() => {
-        setIsSessionInitialized(true);
-      });
-    }
-  }, [sessionId, navigate]);
 
+    initializeSession();
+  }, [sessionId, isSessionInitialized]);
+
+  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  // Auto-resize input
   useEffect(() => {
     const el = textareaRef.current;
     if (el) {
@@ -91,9 +84,13 @@ const ChatPage = () => {
     }
   }, [inputText]);
 
+  const addMessage = (text: string, isUser: boolean) => {
+    setMessages((prev) => [...prev, { text, isUser, timestamp: new Date() }]);
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || isProcessing) return;
+    if (!inputText.trim() || isProcessing || !sessionId) return;
 
     setError(null);
     addMessage(inputText, true);
@@ -101,12 +98,8 @@ const ChatPage = () => {
     setIsProcessing(true);
 
     try {
-      if (sessionId == undefined) {
-        console.log("No session id, can not send a message");
-        return;
-      }
       const response = await chatApi.sendMessage(sessionId, inputText);
-      if (response && response.response) {
+      if (response?.response) {
         addMessage(response.response, false);
       } else {
         throw new Error("Invalid response format");
@@ -114,8 +107,7 @@ const ChatPage = () => {
     } catch (error: any) {
       console.error("Error fetching AI response:", error);
       const errorMessage =
-        error.response?.data?.detail ||
-        "AI is not responding. Please try again later.";
+          error.response?.data?.detail || "AI is not responding. Try again later.";
       setError(errorMessage);
       addMessage("Sorry, I encountered an error. Please try again.", false);
     } finally {
@@ -123,22 +115,22 @@ const ChatPage = () => {
     }
   };
 
-  const addMessage = (text: string, isUser: boolean) => {
-    setMessages((prev) => [...prev, { text, isUser, timestamp: new Date() }]);
-  };
-
   const startNewChat = async () => {
     const newSession = uuidv4();
     localStorage.setItem("sessionId", newSession);
-    await chatApi.createSession(newSession);
     setSessionId(newSession);
+    setIsSessionInitialized(false);
     setMessages([
       {
-        text: "Hi,I am your personal interview coach, how can I help?",
+        text:
+            "Welcome back! Ready to prepare for another interview?\n" +
+            "Just paste a job description or a link to the posting — I’ll handle the rest.\n" +
+            "Once I have the job info, I’ll guide you through different preparation modes.",
         isUser: false,
         timestamp: new Date(),
       },
     ]);
+    setIsProcessing(false);
   };
   const handleLogout = () => {
     authService.logout();
@@ -150,7 +142,9 @@ const ChatPage = () => {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="logo-container">
+          <Link to="/">
           <img src={logo} alt="Logo" className="logo" />
+          </Link>
         </div>
         <div className="sidebar-actions">
           <IconButton
@@ -203,7 +197,7 @@ const ChatPage = () => {
             </div>
           ))}
 
-          {isProcessing && (
+          {isProcessing && messages.length > 0 && (
             <div className="message ai-message">
               <div className="ai-avatar">
                 <div className="ai-avatar-inner"></div>
